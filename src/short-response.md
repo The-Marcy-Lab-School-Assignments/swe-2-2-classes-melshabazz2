@@ -112,3 +112,17 @@ Identify what the mistake is, explain why it is a problem, and suggest a way to 
 ## Response 4
 
 The error is that they are returning the original array instead of a copy of the array. Without returning a copy they expose the original array and this can lead to vulnerability risk.
+
+```js
+class Vault {
+  #secrets = [];
+  addSecret(newSecret) {
+    this.#secrets.push(newSecret);
+  }
+  listSecrets() {
+    return [...this.#secrets];
+  }
+}
+```
+
+This fixes it by using the spread operator which returns a copy and no longer exposes the original array.
