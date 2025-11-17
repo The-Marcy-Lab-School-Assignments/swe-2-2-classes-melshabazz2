@@ -16,9 +16,15 @@ With OOP in JavaScript, it's possible to use factory functions to achieve encaps
 How would you explain to a budding developer what the drawbacks of using factory functions are and why it is better to use classes instead?
 
 ## Response 1
+- ***Factory functions*** duplicate methods for every object they create, this waste memory and is slower.
+***Classes*** store methods once on the prototype, allowing all instances to access them.
 
+- Objects created by factory functions dont have a direct link to a shared prototype so the instanceof operator cant be used.
 
----
+- Its harder to debug private properties/methods that are in closures.
+
+- ***Factory functions*** are flexible with how they return objects but this will result in inconsistent code. ***Classes*** use a standard structure.
+
 
 ## Prompt 2
 
@@ -26,7 +32,14 @@ Explain what factors you should consider when deciding to make a property/method
 
 ## Response 2
 
+The factors you should consider when making a property/method private are
+- ***Internal logic vs public interface***: Properties or methods should be private if its not meant to be called/ accessed by other classes. 
 
+- ***Control and data integrity***: Use private properties to protect the internal state of an object and make sure it can only be modified in controlled ways.
+
+- ***Private helper methods*** can break down large complex methods into smaller and more manageable parts. This improves readability in the code.
+
+- Hiding internal methods prevents other developers from relying on functionality that wasnt
 ---
 
 ## Prompt 3
@@ -35,6 +48,47 @@ Explain what factors you should consider when deciding to make a property/method
 
 ## Response 3
 
+The factors to consider when making a property or method ***static*** are:
+- ***Instance independence***, the function or data does not rely on an objects state.
+
+- The functionality does not need to be changed by subclasses.
+- It stores constants or data shared through all instances.
+- Serves as a factory to create instances.
+- Provides general utility that belongs to the class's domain but can run independently. 
+# Example:
+
+ ``` js 
+ class BankAccount {
+  #balance
+  static #totalBalance = 0
+  constructor(firstName, lastName, balance) {
+    this.firstName = firstName
+    this.lastName = lastName
+    balance ? this.#balance = balance : this.#balance = 0
+    BankAccount.#totalBalance += this.#balance
+  }
+  deposit(amount) {
+    this.#balance += amount
+    BankAccount.#totalBalance += amount
+    return `Your balance is $${this.#balance.toFixed(2)}`
+  }
+  withdraw(amount) {
+    if (amount > this.#balance) {
+      return `You do not have enough funds.`
+    }
+    this.#balance -= amount
+    BankAccount.#totalBalance -= amount
+    return `Your balance is $${this.#balance.toFixed(2)}.`
+  }
+  static getTotalHoldings() {
+    return BankAccount.#totalBalance
+  }
+  showBalance() {
+    return `Your balance is $${this.#balance.toFixed(2)}`
+  }
+
+}
+```
 ---
 
 ## Prompt 4
@@ -56,3 +110,19 @@ class Vault {
 Identify what the mistake is, explain why it is a problem, and suggest a way to fix it.
 
 ## Response 4
+
+The error is that they are returning the original array instead of a copy of the array. Without returning a copy they expose the original array and this can lead to vulnerability risk.
+
+```js
+class Vault {
+  #secrets = [];
+  addSecret(newSecret) {
+    this.#secrets.push(newSecret);
+  }
+  listSecrets() {
+    return [...this.#secrets];
+  }
+}
+```
+
+This fixes it by using the spread operator which returns a copy and no longer exposes the original array.
